@@ -190,7 +190,7 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 -- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 -- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 -- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-
+vim.keymap.set({ 'n', 'v' }, '<leader>l', '<cmd>CodeCompanionChat<cr>', { desc = 'Toggle [L]LM Chat' })
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -406,6 +406,7 @@ require('lazy').setup({
             require('telescope.themes').get_dropdown(),
           },
         },
+        file_ignore_patterns = { 'node%_modules/.*' },
       }
 
       -- Enable Telescope extensions if they are installed
@@ -884,6 +885,7 @@ require('lazy').setup({
           { name = 'luasnip' },
           { name = 'path' },
           { name = 'nvim_lsp_signature_help' },
+          { name = 'codecompanion' },
         },
       }
     end,
@@ -903,6 +905,45 @@ require('lazy').setup({
       }
 
       vim.cmd.colorscheme 'catppuccin'
+    end,
+  },
+
+  {
+    'github/copilot.vim',
+  },
+
+  {
+    'olimorris/codecompanion.nvim',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-treesitter/nvim-treesitter',
+    },
+    config = function()
+      local cc = require 'codecompanion'
+      cc.setup {
+        strategies = {
+          chat = {
+            adapter = 'anthropic',
+          },
+          inline = {
+            adapter = 'anthropic',
+          },
+        },
+        adapters = {
+          anthropic = function()
+            return require('codecompanion.adapters').extend('anthropic', {
+              schema = {
+                model = {
+                  default = 'claude-3-5-haiku-20241022',
+                },
+              },
+              env = {
+                api_key = '',
+              },
+            })
+          end,
+        },
+      }
     end,
   },
 
